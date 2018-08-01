@@ -12,12 +12,11 @@ https://stark-island-45315.herokuapp.com/ Link to hosted version of existing cod
 
 ToDo: 
 
-* ~~Search for a Title by its name.~~ `/api/search/[TITLE]/`
+* ~~Search for a Title by its name.~~ `/api/search/{TitleName}/`
 
 * Display the titles that match the above criteria.
 
-* Allow the user to pull up detailed information about a selected title from the list.
+* ~~Allow the user to pull up detailed information about a selected title from the list.~~ `/api/search/{TitleId}/`
 
-* Frontend CSS
 
 

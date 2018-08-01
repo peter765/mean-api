@@ -43,7 +43,7 @@ app.get('/api/details/:titleid', (req, res) => {
 
     var collection = db.collection('Titles');
 
-    collection.findOne({"TitleId": req.params.titleid}, function(err, document) {
+    collection.findOne({"TitleId": parseInt(req.params.titleid)}, function(err, document) {
       if(document == null) {
         res.json(err);
       }
