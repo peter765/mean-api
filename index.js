@@ -1,33 +1,63 @@
 const express = require('express');
+const MongoClient = require('mongodb').MongoClient;
+const config = require('./config');
 const path = require('path');
 
 const app = express();
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.get('/', (req, res) => {
+  res.json('Hello World');
+});
 
 // Put all API endpoints under '/api'
-app.get('/api/passwords', (req, res) => {
-  const count = 5;
+app.get('/api/search/:query', (req, res) => {
 
-  // Generate some passwords
-  const passwords = Array.from(Array(count).keys()).map(i =>
-    "Hello World"
-  )
+  
+  // Query mongoDB for titles
+  MongoClient.connect(config.mongoURI, function(err, client) {
+    console.log("Mongo Connected");
+  
+    const db = client.db("dev-challenge");
 
-  // Return them as json
-  res.json(passwords);
+    //var cursor = db.collection('Titles').find({"TitleName" : {$regex: req.params.query, $options: "i"}});
 
-  console.log(`Sent ${count} passwords`);
+    var cursor = db.collection('Titles').find({"TitleName" : {$regex: req.params.query, $options: "i"}}).toArray(function(err, arr) {
+      res.json(arr);
+    });
+  
+    client.close();
+  });
+
+
 });
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+app.get('/api/details/:titleid', (req, res) => {
+
+  // Query mongoDB for title id
+  MongoClient.connect(config.mongoURI, function(err, client) {
+    console.log(req.params.titleid);
+  
+    
+    const db = client.db("dev-challenge");
+
+    var collection = db.collection('Titles');
+
+    collection.findOne({"TitleId": req.params.titleid}, function(err, document) {
+      if(document == null) {
+        res.json(err);
+      }
+      res.json(document);
+    });
+    
+    client.close();
+  });
+
 });
+
 
 const port = process.env.PORT || 5000;
-app.listen(port);
+app.listen(port, () => {
+  console.log(`Title db listening on ${port}`);
+});
 
-console.log(`Password generator listening on ${port}`);
